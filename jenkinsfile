@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    environment {
+        // Artifactory credentials
+        ARTIFACTORY_URL = 'http://artifactory.example.com/artifactory'
+        ARTIFACTORY_REPO = 'maven-repo'
+        SONAR_URL = 'http://sonarqube.example.com'
+        SONAR_LOGIN = credentials('sonar-token') // Add SonarQube token in Jenkins credentials
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/your-repository/simple-java-project.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') { // Configure SonarQube in Jenkins
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=simple-java-project'
+                }
+            }
+        }
+
+        stage('Publish to Artifactory') {
+            steps {
+                sh """
+                mvn deploy:deploy-file \
+                    -Durl=${ARTIFACTORY_URL}/${ARTIFACTORY_REPO} \
+                    -DrepositoryId=artifactory \
+                    -Dfile=target/simple-java-project-1.0-SNAPSHOT.jar \
+                    -DpomFile=pom.xml
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
