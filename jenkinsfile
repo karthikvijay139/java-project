@@ -26,6 +26,7 @@ pipeline {
             }
         }
     }
+}
        // stage('Build with Maven') {
        //    steps {
               //   Build the project with Maven
