@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven_3.6.3' // Ensure this matches your Maven configuration name
-    }
+   // tools {
+     //   maven 'Maven_3.6.3' // Ensure this matches your Maven configuration name
+    //}
 
     stages {
         stage('Checkout Code') {
@@ -27,12 +27,12 @@ pipeline {
                 }
             }
         }
-        stage('Build with Maven') {
-            steps {
+      //  stage('Build with Maven') {
+        //    steps {
                 // Build the project with Maven
-                sh 'mvn clean install'
-            }
-        }
+          //      sh 'mvn clean install'
+            //}
+        //}
     }
 }
 
