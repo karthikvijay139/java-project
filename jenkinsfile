@@ -1,39 +1,39 @@
 pipeline {
     agent any
-   tools {
-        // Specify the Maven version to be used if needed
-        maven 'Maven_3.6.3' // Replace with your Maven tool name
-    }
 
-    triggers {
-        githubPush() // Trigger the pipeline using GitHub webhook
+    tools {
+        maven 'Maven_3.6.3' // Ensure this matches your Maven configuration name
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Fetch the repository using the default SCM configuration
-                checkout scm
+                // Checkout code from Git
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '*/main']],
+                          userRemoteConfigs: [[url: 'https://github.com/karthikvijay139/java-project.git']]
+                ])
             }
         }
-
-        stage('Print Commit Message') {
+        stage('Print Branch Name') {
             steps {
+                // Print the current branch name
                 script {
-                    // Get the latest commit message
-                    def commitMessage = sh(
-                        script: "git log -1 --pretty=%B",
+                    def branchName = sh(
+                        script: 'git rev-parse --abbrev-ref HEAD',
                         returnStdout: true
                     ).trim()
-                    echo "Commit Message: ${commitMessage}"
+                    echo "Current branch: ${branchName}"
                 }
+            }
+        }
+        stage('Build with Maven') {
+            steps {
+                // Build the project with Maven
+                sh 'mvn clean install'
             }
         }
     }
 }
 
-
-   
-
-    
 
