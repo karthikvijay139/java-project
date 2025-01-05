@@ -1,28 +1,39 @@
 pipeline {
     agent any
-
-    tools {
+   tools {
         // Specify the Maven version to be used if needed
         maven 'Maven_3.6.3' // Replace with your Maven tool name
+    }
+
+    triggers {
+        githubPush() // Trigger the pipeline using GitHub webhook
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                script {
-                    // Use pom.xml for SCM configuration
-                    def scmVars = checkout(scm: [$class: 'PomScmProvider'])
-                    echo "Checked out code from ${scmVars.GIT_URL} at branch ${scmVars.GIT_BRANCH}"
-                }
+                // Fetch the repository using the default SCM configuration
+                checkout scm
             }
         }
-        stage('Print Branch Name') {
+
+        stage('Print Commit Message') {
             steps {
                 script {
-                    echo "Current Branch: ${env.GIT_BRANCH ?: 'Branch info not available'}"
+                    // Get the latest commit message
+                    def commitMessage = sh(
+                        script: "git log -1 --pretty=%B",
+                        returnStdout: true
+                    ).trim()
+                    echo "Commit Message: ${commitMessage}"
                 }
             }
         }
     }
 }
+
+
+   
+
+    
 
