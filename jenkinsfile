@@ -1,39 +1,24 @@
 pipeline {
     agent any
-
-   // tools {
-     //   maven 'Maven_3.6.3' // Ensure this matches your Maven configuration name
-    //}
-
+    
     stages {
-        stage('Checkout Code') {
-            steps {
-                // Check out the code from the GitHub repository
-                checkout scm
-            }
-        }
-
-        stage('Print Current Branch') {
+        stage('Checkout') {
             steps {
                 script {
-                    // Use a shell command to fetch the current branch name
-                    def branchName = sh(
-                        script: "git rev-parse --abbrev-ref HEAD",
-                        returnStdout: true
-                    ).trim()
-                    echo "Current Branch Name: ${branchName}"
+                    // Checkout the code using pomscm
+                    checkout scm
+                }
+            }
+        }
+        
+        stage('Print Branch Name') {
+            steps {
+                script {
+                    // Print the current branch name
+                    def branchName = env.GIT_BRANCH ?: 'No branch found'
+                    echo "Current Branch: ${branchName}"
                 }
             }
         }
     }
 }
-       // stage('Build with Maven') {
-       //    steps {
-              //   Build the project with Maven
-          //      sh 'mvn clean install'
-            //}
-        //}
-  //  }
-//}
-
-
